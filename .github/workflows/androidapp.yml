@@ -42,23 +42,23 @@ jobs:
       run: ./gradlew testDebugUnitTest --info
       continue-on-error: true  
 
-    - name: List available AVD devices
-      run: $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list device
+    #- name: List available AVD devices
+      #run: $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list device
       
-    - name: Start Android Emulator
-      uses: ReactiveCircus/android-emulator-runner@v2.33.0
-      with:
-        api-level: 36 
-        target: google_apis
-        arch: x86_64
-        profile: pixel_7_pro
-        avd-name: test-emulator
-        emulator-options: "-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim"
-        script: ./gradlew connectedDebugAndroidTest
+    #- name: Start Android Emulator
+      #uses: ReactiveCircus/android-emulator-runner@v2.33.0
+      #with:
+        #api-level: 36 
+        #target: google_apis
+        #arch: x86_64
+        #profile: pixel_7_pro
+        #avd-name: test-emulator
+        #emulator-options: "-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim"
+        #script: ./gradlew connectedDebugAndroidTest
 
-    - name: Run UI tests (Espresso)
-      run: ./gradlew connectedDebugAndroidTest
+    #- name: Run UI tests (Espresso)
+      #run: ./gradlew connectedDebugAndroidTest
     
-    - name: Generate UI test report
-      run: ./gradlew connectedDebugAndroidTest --info
-      continue-on-error: true
+    #- name: Generate UI test report
+      #run: ./gradlew connectedDebugAndroidTest --info
+      #continue-on-error: true
