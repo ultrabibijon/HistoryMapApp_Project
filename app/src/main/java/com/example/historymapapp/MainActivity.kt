@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        // Open Street Map
         Configuration.getInstance()
             .load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
 
