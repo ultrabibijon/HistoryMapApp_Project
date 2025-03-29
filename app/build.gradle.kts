@@ -49,4 +49,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.database)
     implementation(libs.osmdroid.android)
+    implementation(libs.firebase.firestore)
+    implementation (libs.material)
 }
