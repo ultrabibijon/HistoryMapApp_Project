@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="BottomSheetStyle" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="behavior_peekHeight">400dp</item> <!-- Minimalna wysokość, gdy jest zwinięty -->
+        <item name="behavior_hideable">true</item> <!-- Możliwość zamknięcia -->
+        <item name="behavior_skipCollapsed">false</item> <!-- Nie pomija stanu częściowo rozwiniętego -->
+    </style>
+</resources>

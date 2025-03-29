@@ -75,12 +75,20 @@ class MainActivity : AppCompatActivity() {
             this.title = title
             setOnMarkerClickListener { _, _ ->
                 // Po kliknięciu otwieramy BottomSheet
-                val bottomSheet = PlaceBottomSheet(title, description)
+                val bottomSheet = PlaceBottomSheet(title, description, lat, lon)
                 bottomSheet.show(supportFragmentManager, "PlaceBottomSheet")
+                focusOnMarker(lat, lon)
                 true
             }
         }
         map.overlays.add(marker)
+    }
+
+    // Funkcja do przybliżenia mapy na dany punkt
+    private fun focusOnMarker(lat: Double, lon: Double) {
+        val geoPoint = GeoPoint(lat, lon)
+        map.controller.animateTo(geoPoint)
+        map.controller.setZoom(15.0) // Przybliżenie na wybrany punkt
     }
 
 }

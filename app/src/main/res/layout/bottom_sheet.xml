@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/rounded_corner_bg"
-    android:padding="16dp">
-
+    android:padding="16dp"
+    tools:context=".PlaceBottomSheet">
 
     <View
         android:id="@+id/view"
@@ -37,6 +38,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:paddingTop="8dp"
+        android:maxLines="6"
+        android:ellipsize="end"
         android:text="Opis miejsca..."
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
