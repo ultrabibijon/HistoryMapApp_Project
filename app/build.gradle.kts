@@ -51,4 +51,5 @@ dependencies {
     implementation(libs.osmdroid.android)
     implementation(libs.firebase.firestore)
     implementation (libs.material)
+    implementation (libs.glide)
 }

@@ -11,9 +11,9 @@ import com.google.firebase.ktx.Firebase
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,9 +35,28 @@ class MainActivity : AppCompatActivity() {
             .load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
 
         map = findViewById(R.id.map)
-        map.setTileSource(TileSourceFactory.MAPNIK)
-        map.controller.setZoom(10.0)
-        map.controller.setCenter(GeoPoint(52.2298, 21.0122)) // Warszawa
+
+        map.apply{
+            setTileSource(TileSourceFactory.MAPNIK)
+            controller.setZoom(10.0)
+            controller.setCenter(GeoPoint(52.2298, 21.0122))
+            minZoomLevel = 4.0
+            maxZoomLevel = 15.0
+
+            isHorizontalMapRepetitionEnabled = true
+            isVerticalMapRepetitionEnabled = false
+
+            val worldBounds = BoundingBox(
+                85.0,
+                180.0,
+                -85.0,
+                -180.0
+            )
+            setScrollableAreaLimitDouble(worldBounds)
+
+            setMultiTouchControls(true)
+
+        }
 
         getMarkersFromFirestore()
 
@@ -54,8 +73,9 @@ class MainActivity : AppCompatActivity() {
                     val lon = document.getDouble("Longitude") ?: 0.0
                     val title = document.getString("Name of Incident") ?: "Nieznane miejsce"
                     val description = document.getString("Describe Event") ?: "Brak opisu"
+                    val imageURL = document.getString("imageURL") ?: ""
 
-                    addMarker(lat, lon, title, description)
+                    addMarker(lat, lon, title, description, imageURL)
                 }
             }
             .addOnFailureListener { exception ->
@@ -63,7 +83,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun addMarker(lat: Double, lon: Double, title: String, description: String) {
+    private fun addMarker(lat: Double, lon: Double, title: String, description: String, imageURL: String) {
         if (!this::map.isInitialized) {
             Log.e("MainActivity", "Map is not initialized yet!")
             return
@@ -75,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             this.title = title
             setOnMarkerClickListener { _, _ ->
                 // Po kliknięciu otwieramy BottomSheet
-                val bottomSheet = PlaceBottomSheet(title, description, lat, lon)
+                val bottomSheet = PlaceBottomSheet(title, description, imageURL, lat, lon)
                 bottomSheet.show(supportFragmentManager, "PlaceBottomSheet")
                 focusOnMarker(lat, lon)
                 true
@@ -88,7 +108,7 @@ class MainActivity : AppCompatActivity() {
     private fun focusOnMarker(lat: Double, lon: Double) {
         val geoPoint = GeoPoint(lat, lon)
         map.controller.animateTo(geoPoint)
-        map.controller.setZoom(15.0) // Przybliżenie na wybrany punkt
+        map.controller.setZoom(15.0)
     }
 
 }

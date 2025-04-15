@@ -2,9 +2,9 @@
 <resources>
     <style name="BottomSheetStyle" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
-        <item name="behavior_peekHeight">150dp</item> <!-- Mały stan -->
-        <item name="behavior_halfExpandedRatio">0.5</item> <!-- Średni stan (50% ekranu) -->
-        <item name="behavior_hideable">true</item> <!-- Możliwość zamknięcia -->
-        <item name="behavior_skipCollapsed">false</item> <!-- Nie pomija stanu częściowo rozwiniętego -->
+        <item name="behavior_peekHeight">150dp</item>
+        <item name="behavior_halfExpandedRatio">0.5</item>
+        <item name="behavior_hideable">true</item>
+        <item name="behavior_skipCollapsed">false</item>
     </style>
 </resources>
