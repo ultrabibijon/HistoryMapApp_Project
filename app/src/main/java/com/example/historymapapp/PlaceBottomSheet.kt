@@ -1,6 +1,8 @@
 package com.example.historymapapp
 
 import android.app.Dialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +14,13 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.core.net.toUri
 
 class PlaceBottomSheet(
     private val title: String,
     private val description: String,
     private val imageURL: String,
+    private val wikiURL: String,
     private val lat: Double,
     private val lon: Double
 ) : BottomSheetDialogFragment() {
@@ -30,8 +34,7 @@ class PlaceBottomSheet(
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+        savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.bottom_sheet, container, false)
     }
 
@@ -41,6 +44,8 @@ class PlaceBottomSheet(
         val titleTextView = view.findViewById<TextView>(R.id.place_title)
         val descriptionTextView = view.findViewById<TextView>(R.id.place_description)
         val imageView = view.findViewById<ImageView>(R.id.place_image)
+        val wikiLabelTextView = view.findViewById<TextView>(R.id.wikipedia_label)
+        val wikiTextView = view.findViewById<TextView>(R.id.place_wikipedia)
 
         titleTextView.text = title
         descriptionTextView.text = description
@@ -49,6 +54,13 @@ class PlaceBottomSheet(
             .load(imageURL)
             //.placeholder(R.drawable.placeholder_image)
             .into(imageView)
+
+        wikiTextView.text = wikiURL
+        wikiTextView.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, wikiURL.toUri())
+            startActivity(intent)
+        }
+        wikiLabelTextView.text = "Learn more about $title:"
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

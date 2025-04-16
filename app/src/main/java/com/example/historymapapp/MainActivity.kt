@@ -74,8 +74,9 @@ class MainActivity : AppCompatActivity() {
                     val title = document.getString("Name of Incident") ?: "Nieznane miejsce"
                     val description = document.getString("Describe Event") ?: "Brak opisu"
                     val imageURL = document.getString("imageURL") ?: ""
+                    val wikiURL = document.getString("wikiURL") ?: ""
 
-                    addMarker(lat, lon, title, description, imageURL)
+                    addMarker(lat, lon, title, description, imageURL, wikiURL)
                 }
             }
             .addOnFailureListener { exception ->
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun addMarker(lat: Double, lon: Double, title: String, description: String, imageURL: String) {
+    private fun addMarker(lat: Double, lon: Double, title: String, description: String, imageURL: String, wikiURL: String) {
         if (!this::map.isInitialized) {
             Log.e("MainActivity", "Map is not initialized yet!")
             return
@@ -95,7 +96,7 @@ class MainActivity : AppCompatActivity() {
             this.title = title
             setOnMarkerClickListener { _, _ ->
                 // Po kliknięciu otwieramy BottomSheet
-                val bottomSheet = PlaceBottomSheet(title, description, imageURL, lat, lon)
+                val bottomSheet = PlaceBottomSheet(title, description, imageURL, wikiURL, lat, lon)
                 bottomSheet.show(supportFragmentManager, "PlaceBottomSheet")
                 focusOnMarker(lat, lon)
                 true
