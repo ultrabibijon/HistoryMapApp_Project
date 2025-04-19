@@ -1,7 +1,11 @@
 package com.example.historymapapp
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -19,6 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var map: MapView
     private val db = Firebase.firestore
+    private val markerList = mutableListOf<Marker>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 
         map = findViewById(R.id.map)
 
-        map.apply{
+        map.apply {
             setTileSource(TileSourceFactory.MAPNIK)
             controller.setZoom(10.0)
             controller.setCenter(GeoPoint(52.2298, 21.0122))
@@ -59,6 +64,47 @@ class MainActivity : AppCompatActivity() {
         }
 
         getMarkersFromFirestore()
+
+        // Obsługa wyszukiwarki
+        val searchBar = findViewById<EditText>(R.id.search_bar)
+        searchBar.setOnEditorActionListener { v, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                val query = v.text.toString().trim()
+                searchForEvent(query)
+                true
+            } else {
+                false
+            }
+        }
+
+        @Suppress("ClickableViewAccessibility")
+        searchBar.setOnTouchListener { _, event ->
+            val drawableEnd = 2 // Index drawableEnd
+
+            if (event.action == android.view.MotionEvent.ACTION_UP) {
+                val drawable = searchBar.compoundDrawables[drawableEnd]
+                if (drawable != null &&
+                    event.rawX >= (searchBar.right - drawable.bounds.width() - searchBar.paddingEnd)
+                ) {
+                    searchBar.text.clear()
+                    searchBar.performClick() // Inform system o kliknięciu
+                    return@setOnTouchListener true
+                }
+            }
+
+            false
+        }
+
+        // Czyszczenie pola wyszukiwania po kliknięciu ikony
+        searchBar.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.isNullOrEmpty()) {
+                    // Można np. odświeżyć markery lub przywrócić domyślny widok mapy
+                }
+            }
+        })
 
     }
 
@@ -94,15 +140,31 @@ class MainActivity : AppCompatActivity() {
             position = GeoPoint(lat, lon)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             this.title = title
-            setOnMarkerClickListener { _, _ ->
-                // Po kliknięciu otwieramy BottomSheet
-                val bottomSheet = PlaceBottomSheet(title, description, imageURL, wikiURL, lat, lon)
-                bottomSheet.show(supportFragmentManager, "PlaceBottomSheet")
-                focusOnMarker(lat, lon)
+            this.subDescription = description
+
+            this.setOnMarkerClickListener { clickedMarker, _ ->
+                focusOnMarker(clickedMarker.position.latitude, clickedMarker.position.longitude)
+
+                val event = clickedMarker.relatedObject as? EventData
+                if (event != null) {
+                    val bottomSheet = PlaceBottomSheet(
+                        event.title,
+                        event.description,
+                        event.imageURL,
+                        event.wikiURL,
+                        clickedMarker.position.latitude,
+                        clickedMarker.position.longitude
+                    )
+                    bottomSheet.show(supportFragmentManager, "PlaceBottomSheet")
+                }
                 true
             }
+
+            relatedObject = EventData(title, description, imageURL, wikiURL)
         }
+
         map.overlays.add(marker)
+        markerList.add(marker)
     }
 
     // Funkcja do przybliżenia mapy na dany punkt
@@ -112,4 +174,38 @@ class MainActivity : AppCompatActivity() {
         map.controller.setZoom(15.0)
     }
 
+    // Funkcja wyszukiwania wydarzenia po nazwie
+    private fun searchForEvent(query: String) {
+        val foundMarker = markerList.firstOrNull {
+            it.title?.contains(query, ignoreCase = true) == true
+        }
+
+        if (foundMarker != null) {
+            focusOnMarker(foundMarker.position.latitude, foundMarker.position.longitude)
+
+            val event = foundMarker.relatedObject as? EventData
+            if (event != null) {
+                val bottomSheet = PlaceBottomSheet(
+                    event.title,
+                    event.description,
+                    event.imageURL,
+                    event.wikiURL,
+                    foundMarker.position.latitude,
+                    foundMarker.position.longitude
+                )
+                bottomSheet.show(supportFragmentManager, "PlaceBottomSheet")
+            }
+
+        } else {
+            Log.d("Search", "Nie znaleziono wydarzenia: $query")
+        }
+    }
+
 }
+
+data class EventData(
+    val title: String,
+    val description: String,
+    val imageURL: String,
+    val wikiURL: String
+)
