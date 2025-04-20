@@ -1,13 +1,13 @@
 package com.example.historymapapp
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.firestore.ktx.firestore
@@ -18,6 +18,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
+import android.widget.Toast
+import org.osmdroid.views.CustomZoomButtonsController
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,11 +37,27 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        val btnFavorite = findViewById<ImageButton>(R.id.btn_favorite)
+        val btnNotes = findViewById<ImageButton>(R.id.btn_notes)
+        val btnRecent = findViewById<ImageButton>(R.id.btn_recent)
+        val btnAbout = findViewById<ImageButton>(R.id.btn_about)
+        val btnSettings = findViewById<ImageButton>(R.id.btn_settings)
+        val btnZoomIn = findViewById<ImageButton>(R.id.btn_zoom_in)
+        val btnZoomOut = findViewById<ImageButton>(R.id.btn_zoom_out)
+
         // Open Street Map
         Configuration.getInstance()
             .load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
 
         map = findViewById(R.id.map)
+
+        btnZoomIn.setOnClickListener {
+            map.controller.zoomIn()
+        }
+
+        btnZoomOut.setOnClickListener {
+            map.controller.zoomOut()
+        }
 
         map.apply {
             setTileSource(TileSourceFactory.MAPNIK)
@@ -50,6 +68,7 @@ class MainActivity : AppCompatActivity() {
 
             isHorizontalMapRepetitionEnabled = true
             isVerticalMapRepetitionEnabled = false
+            zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
 
             val worldBounds = BoundingBox(
                 85.0,
@@ -79,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
         @Suppress("ClickableViewAccessibility")
         searchBar.setOnTouchListener { _, event ->
-            val drawableEnd = 2 // Index drawableEnd
+            val drawableEnd = 2
 
             if (event.action == android.view.MotionEvent.ACTION_UP) {
                 val drawable = searchBar.compoundDrawables[drawableEnd]
@@ -87,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                     event.rawX >= (searchBar.right - drawable.bounds.width() - searchBar.paddingEnd)
                 ) {
                     searchBar.text.clear()
-                    searchBar.performClick() // Inform system o kliknięciu
+                    searchBar.performClick()
                     return@setOnTouchListener true
                 }
             }
@@ -95,21 +114,37 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-        // Czyszczenie pola wyszukiwania po kliknięciu ikony
-        searchBar.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()) {
-                    // Można np. odświeżyć markery lub przywrócić domyślny widok mapy
-                }
-            }
-        })
+        btnFavorite.setOnClickListener {
+            Toast.makeText(this, "Dodano do ulubionych", Toast.LENGTH_SHORT).show()
+            // TODO: dodaj logikę ulubionych
+        }
+
+        btnNotes.setOnClickListener {
+            Toast.makeText(this, "Notatki", Toast.LENGTH_SHORT).show()
+            // TODO: otwórz notatki
+        }
+
+        btnRecent.setOnClickListener {
+            Toast.makeText(this, "Ostatnio oglądane", Toast.LENGTH_SHORT).show()
+            // TODO: pokaż historię
+        }
+
+        btnAbout.setOnClickListener {
+            Toast.makeText(this, "O aplikacji", Toast.LENGTH_SHORT).show()
+            // TODO: otwórz info
+        }
+
+        btnSettings.setOnClickListener {
+            Toast.makeText(this, "Ustawienia", Toast.LENGTH_SHORT).show()
+            // TODO: otwórz ustawienia
+        }
 
     }
 
     // Funkcja pobierająca dane z Firestore
     private fun getMarkersFromFirestore() {
+        map.overlays.clear()
+        markerList.clear()
         // Kolekcja "locations"
         db.collection("historical_events")
             .get()
@@ -121,8 +156,9 @@ class MainActivity : AppCompatActivity() {
                     val description = document.getString("Describe Event") ?: "Brak opisu"
                     val imageURL = document.getString("imageURL") ?: ""
                     val wikiURL = document.getString("wikiURL") ?: ""
+                    val type = document.getString("Type of Event") ?: "other"
 
-                    addMarker(lat, lon, title, description, imageURL, wikiURL)
+                    addMarker(lat, lon, title, description, imageURL, wikiURL, type)
                 }
             }
             .addOnFailureListener { exception ->
@@ -130,15 +166,34 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun addMarker(lat: Double, lon: Double, title: String, description: String, imageURL: String, wikiURL: String) {
+    private fun addMarker(
+        lat: Double,
+        lon: Double,
+        title: String,
+        description: String,
+        imageURL: String,
+        wikiURL: String,
+        type: String) {
         if (!this::map.isInitialized) {
             Log.e("MainActivity", "Map is not initialized yet!")
             return
         }
 
+        val iconRes = when (type.lowercase()) {
+            "battle" -> R.drawable.ic_marker_battle
+            "political" -> R.drawable.ic_marker_political
+            "terrorism" -> R.drawable.ic_marker_terrorism
+            "industrial disaster", "nature disaster" -> R.drawable.ic_marker_disaster
+            "sport" -> R.drawable.ic_marker_sport
+            "science" -> R.drawable.ic_marker_science
+            else -> null
+        }
+
         val marker = Marker(map).apply {
             position = GeoPoint(lat, lon)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            icon = iconRes?.let { ContextCompat.getDrawable(this@MainActivity, it) }
+
             this.title = title
             this.subDescription = description
 
@@ -160,7 +215,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
-            relatedObject = EventData(title, description, imageURL, wikiURL)
+            relatedObject = EventData(title, description, imageURL, wikiURL, type)
         }
 
         map.overlays.add(marker)
@@ -198,6 +253,7 @@ class MainActivity : AppCompatActivity() {
 
         } else {
             Log.d("Search", "Nie znaleziono wydarzenia: $query")
+            Toast.makeText(this, "Brak wyników dla: $query", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -207,5 +263,6 @@ data class EventData(
     val title: String,
     val description: String,
     val imageURL: String,
-    val wikiURL: String
+    val wikiURL: String,
+    val type: String
 )
