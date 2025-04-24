@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var map: MapView
     private val db = Firebase.firestore
     private val markerList = mutableListOf<Marker>()
+    private var selectedEpochsGlobal: Set<String> = emptySet()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +51,18 @@ class MainActivity : AppCompatActivity() {
             .load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
 
         map = findViewById(R.id.map)
+
+        val btnFilter = findViewById<ImageButton>(R.id.btn_filter)
+        btnFilter.setOnClickListener {
+            val filterBottomSheet = EpochBottomSheet(
+                preselectedEpochs = selectedEpochsGlobal,
+                onEpochSelected = { selected ->
+                    selectedEpochsGlobal = selected
+                    filterMarkersByEpoch(selected)
+                }
+            )
+            filterBottomSheet.show(supportFragmentManager, "EpochFilterBottomSheet")
+        }
 
         btnZoomIn.setOnClickListener {
             map.controller.zoomIn()
@@ -157,8 +170,9 @@ class MainActivity : AppCompatActivity() {
                     val imageURL = document.getString("imageURL") ?: ""
                     val wikiURL = document.getString("wikiURL") ?: ""
                     val type = document.getString("Type of Event") ?: "other"
+                    val epoch = document.getString("Epoch") ?: "other"
 
-                    addMarker(lat, lon, title, description, imageURL, wikiURL, type)
+                    addMarker(lat, lon, title, description, imageURL, wikiURL, type, epoch)
                 }
             }
             .addOnFailureListener { exception ->
@@ -173,7 +187,8 @@ class MainActivity : AppCompatActivity() {
         description: String,
         imageURL: String,
         wikiURL: String,
-        type: String) {
+        type: String,
+        epoch: String) {
         if (!this::map.isInitialized) {
             Log.e("MainActivity", "Map is not initialized yet!")
             return
@@ -196,6 +211,7 @@ class MainActivity : AppCompatActivity() {
 
             this.title = title
             this.subDescription = description
+            //infoWindow = null
 
             this.setOnMarkerClickListener { clickedMarker, _ ->
                 focusOnMarker(clickedMarker.position.latitude, clickedMarker.position.longitude)
@@ -215,12 +231,27 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
-            relatedObject = EventData(title, description, imageURL, wikiURL, type)
+            relatedObject = EventData(title, description, imageURL, wikiURL, type, epoch)
         }
 
         map.overlays.add(marker)
         markerList.add(marker)
     }
+
+    private fun filterMarkersByEpoch(selectedEpochs: Set<String>) {
+        map.overlays.clear()
+
+        for (marker in markerList) {
+            val event = marker.relatedObject as? EventData
+            if (event != null) {
+                if (selectedEpochs.isEmpty() || selectedEpochs.contains(event.epoch)) {
+                    map.overlays.add(marker)
+                }
+            }
+        }
+        map.invalidate()
+    }
+
 
     // Funkcja do przybliżenia mapy na dany punkt
     private fun focusOnMarker(lat: Double, lon: Double) {
@@ -264,5 +295,6 @@ data class EventData(
     val description: String,
     val imageURL: String,
     val wikiURL: String,
-    val type: String
+    val type: String,
+    val epoch: String
 )

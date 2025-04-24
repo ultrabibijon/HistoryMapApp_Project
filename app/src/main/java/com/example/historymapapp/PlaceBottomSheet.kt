@@ -2,7 +2,6 @@ package com.example.historymapapp
 
 import android.app.Dialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -71,7 +70,7 @@ class PlaceBottomSheet(
                 dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
 
             bottomSheet?.let {
-                it.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corner_bg)
+                it.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_bottom_sheet_corner_bg)
                 it.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
                 it.requestLayout()
 
