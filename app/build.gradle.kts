@@ -38,18 +38,27 @@ android {
 
 dependencies {
 
+    // Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
+    // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // OpenStreetMap
+    implementation(libs.osmdroid.android)
+
+    // Glide - images
+    implementation(libs.glide)
+
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.database)
-    implementation(libs.osmdroid.android)
     implementation(libs.firebase.firestore)
-    implementation (libs.material)
-    implementation (libs.glide)
+
 }
