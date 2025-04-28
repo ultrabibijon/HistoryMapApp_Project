@@ -19,11 +19,14 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import org.osmdroid.views.CustomZoomButtonsController
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var map: MapView
+    private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
     private val markerList = mutableListOf<Marker>()
     private var selectedEpochsGlobal: Set<String> = emptySet()
@@ -38,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        val btnFilter = findViewById<ImageButton>(R.id.btn_filter)
         val btnFavorite = findViewById<ImageButton>(R.id.btn_favorite)
         val btnNotes = findViewById<ImageButton>(R.id.btn_notes)
         val btnRecent = findViewById<ImageButton>(R.id.btn_recent)
@@ -46,13 +50,36 @@ class MainActivity : AppCompatActivity() {
         val btnZoomIn = findViewById<ImageButton>(R.id.btn_zoom_in)
         val btnZoomOut = findViewById<ImageButton>(R.id.btn_zoom_out)
 
+        // Firebase Authentication
+        auth = Firebase.auth
+
+        // Anonymous logging
+        if (auth.currentUser == null) {
+            auth.signInAnonymously()
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        val user = auth.currentUser
+                        Log.d("FirebaseAuth", "Zalogowano anonimowo. UID: ${user?.uid}")
+                        Toast.makeText(this, "Zalogowano anonimowo!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Log.e("FirebaseAuth", "Błąd logowania anonimowego", task.exception)
+                        Toast.makeText(this, "Błąd logowania!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } else {
+            val user = auth.currentUser
+            Log.d("FirebaseAuth", "Użytkownik już zalogowany. UID: ${user?.uid}")
+        }
+
         // Open Street Map
         Configuration.getInstance()
             .load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
 
         map = findViewById(R.id.map)
 
-        val btnFilter = findViewById<ImageButton>(R.id.btn_filter)
+        // Przyciski na mapie
+
+        // Przycisk - filtrowanie według epoki
         btnFilter.setOnClickListener {
             val filterBottomSheet = EpochBottomSheet(
                 preselectedEpochs = selectedEpochsGlobal,
@@ -64,10 +91,12 @@ class MainActivity : AppCompatActivity() {
             filterBottomSheet.show(supportFragmentManager, "EpochFilterBottomSheet")
         }
 
+        // Przycisk - przybliżenie mapy
         btnZoomIn.setOnClickListener {
             map.controller.zoomIn()
         }
 
+        // Przycisk - oddalanie mapy
         btnZoomOut.setOnClickListener {
             map.controller.zoomOut()
         }
@@ -127,26 +156,31 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
+        // Przycisk - przejście do ulubionych
         btnFavorite.setOnClickListener {
             Toast.makeText(this, "Dodano do ulubionych", Toast.LENGTH_SHORT).show()
             // TODO: dodaj logikę ulubionych
         }
 
+        // Przycisk - przejście do notatek
         btnNotes.setOnClickListener {
             Toast.makeText(this, "Notatki", Toast.LENGTH_SHORT).show()
             // TODO: otwórz notatki
         }
 
+        // Przcycisk - przejście do ostatnio oglądanych
         btnRecent.setOnClickListener {
             Toast.makeText(this, "Ostatnio oglądane", Toast.LENGTH_SHORT).show()
             // TODO: pokaż historię
         }
 
+        // Przycisk - przejście do informacji o aplikacji
         btnAbout.setOnClickListener {
             Toast.makeText(this, "O aplikacji", Toast.LENGTH_SHORT).show()
             // TODO: otwórz info
         }
 
+        // Przycisk - przejścoe do ustawień
         btnSettings.setOnClickListener {
             Toast.makeText(this, "Ustawienia", Toast.LENGTH_SHORT).show()
             // TODO: otwórz ustawienia
