@@ -1,8 +1,11 @@
 package com.example.historymapapp
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
@@ -21,12 +24,19 @@ import org.osmdroid.views.overlay.Marker
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
 import org.osmdroid.views.CustomZoomButtonsController
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var map: MapView
     private lateinit var auth: FirebaseAuth
+    private lateinit var database: DatabaseReference
+    private lateinit var searchBar: EditText
     private val db = Firebase.firestore
     private val markerList = mutableListOf<Marker>()
     private var selectedEpochsGlobal: Set<String> = emptySet()
@@ -52,6 +62,9 @@ class MainActivity : AppCompatActivity() {
 
         // Firebase Authentication
         auth = Firebase.auth
+
+        // Firebase Realtime Database
+        database = Firebase.database("https://historymapapp-2e0cb-default-rtdb.europe-west1.firebasedatabase.app/").reference
 
         // Anonymous logging
         if (auth.currentUser == null) {
@@ -127,11 +140,13 @@ class MainActivity : AppCompatActivity() {
         getMarkersFromFirestore()
 
         // Obsługa wyszukiwarki
-        val searchBar = findViewById<EditText>(R.id.search_bar)
+        searchBar = findViewById(R.id.search_bar)
         searchBar.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val query = v.text.toString().trim()
                 searchForEvent(query)
+                searchBar.clearFocus()
+                hideKeyboard()
                 true
             } else {
                 false
@@ -148,6 +163,8 @@ class MainActivity : AppCompatActivity() {
                     event.rawX >= (searchBar.right - drawable.bounds.width() - searchBar.paddingEnd)
                 ) {
                     searchBar.text.clear()
+                    searchBar.clearFocus()
+                    hideKeyboard()
                     searchBar.performClick()
                     return@setOnTouchListener true
                 }
@@ -158,8 +175,8 @@ class MainActivity : AppCompatActivity() {
 
         // Przycisk - przejście do ulubionych
         btnFavorite.setOnClickListener {
-            Toast.makeText(this, "Dodano do ulubionych", Toast.LENGTH_SHORT).show()
-            // TODO: dodaj logikę ulubionych
+            val intent = Intent(this, FavoritesActivity::class.java)
+            startActivity(intent)
         }
 
         // Przycisk - przejście do notatek
@@ -186,13 +203,49 @@ class MainActivity : AppCompatActivity() {
             // TODO: otwórz ustawienia
         }
 
+        // Obsługa przekierowania z FavoritesActivity
+        intent?.let {
+            if (it.hasExtra("latitude") && it.hasExtra("longitude")) {
+                val lat = it.getDoubleExtra("latitude", 0.0)
+                val lon = it.getDoubleExtra("longitude", 0.0)
+                val title = it.getStringExtra("title") ?: ""
+
+                map.postDelayed({
+                    focusOnMarker(lat, lon)
+
+                    markerList.firstOrNull { marker -> marker.title == title }?.let { marker ->
+                        val event = marker.relatedObject as? EventData
+                        if (event != null) {
+                            val bottomSheet = PlaceBottomSheet(
+                                event.title,
+                                event.description,
+                                event.imageURL,
+                                event.wikiURL,
+                                marker.position.latitude,
+                                marker.position.longitude,
+                                isFavorite = true,
+                                onFavoriteChanged = { isFavorite ->
+                                    if (isFavorite) {
+                                        addToFavorites(event, marker.position.latitude, marker.position.longitude)
+                                    } else {
+                                        removeFromFavorites(event.title)
+                                    }
+                                }
+                            )
+                            bottomSheet.show(supportFragmentManager, "PlaceBottomSheet")
+                        }
+                    }
+                }, 500)
+            }
+        }
+
     }
 
     // Funkcja pobierająca dane z Firestore
     private fun getMarkersFromFirestore() {
         map.overlays.clear()
         markerList.clear()
-        // Kolekcja "locations"
+
         db.collection("historical_events")
             .get()
             .addOnSuccessListener { result ->
@@ -258,7 +311,15 @@ class MainActivity : AppCompatActivity() {
                         event.imageURL,
                         event.wikiURL,
                         clickedMarker.position.latitude,
-                        clickedMarker.position.longitude
+                        clickedMarker.position.longitude,
+                        isFavorite = checkIfFavorite(event.title),
+                        onFavoriteChanged = { isFavorite ->
+                            if (isFavorite) {
+                                addToFavorites(event, clickedMarker.position.latitude, clickedMarker.position.longitude)
+                            } else {
+                                removeFromFavorites(event.title)
+                            }
+                        }
                     )
                     bottomSheet.show(supportFragmentManager, "PlaceBottomSheet")
                 }
@@ -270,6 +331,54 @@ class MainActivity : AppCompatActivity() {
 
         map.overlays.add(marker)
         markerList.add(marker)
+    }
+
+    private fun checkIfFavorite(eventTitle: String): Boolean {
+        val userId = auth.currentUser?.uid ?: return false
+        var isFavorite = false
+        database.child("favorites").child(userId).child(eventTitle)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    isFavorite = snapshot.exists()
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
+        return isFavorite
+    }
+
+    private fun addToFavorites(event: EventData, lat: Double, lon: Double) {
+        val userId = auth.currentUser?.uid ?: return
+        val favorite = FavoriteEvent(
+            userId = userId,
+            eventId = event.title,
+            title = event.title,
+            description = event.description,
+            imageURL = event.imageURL,
+            wikiURL = event.wikiURL,
+            type = event.type,
+            epoch = event.epoch,
+            latitude = lat,
+            longitude = lon
+        )
+
+        database.child("favorites").child(userId).child(event.title).setValue(favorite)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Dodano do ulubionych", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Błąd podczas dodawania", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun removeFromFavorites(eventTitle: String) {
+        val userId = auth.currentUser?.uid ?: return
+        database.child("favorites").child(userId).child(eventTitle).removeValue()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Usunięto z ulubionych", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Błąd podczas usuwania", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun filterMarkersByEpoch(selectedEpochs: Set<String>) {
@@ -302,6 +411,8 @@ class MainActivity : AppCompatActivity() {
 
         if (foundMarker != null) {
             focusOnMarker(foundMarker.position.latitude, foundMarker.position.longitude)
+            searchBar.clearFocus()
+            hideKeyboard()
 
             val event = foundMarker.relatedObject as? EventData
             if (event != null) {
@@ -311,7 +422,15 @@ class MainActivity : AppCompatActivity() {
                     event.imageURL,
                     event.wikiURL,
                     foundMarker.position.latitude,
-                    foundMarker.position.longitude
+                    foundMarker.position.longitude,
+                    isFavorite = checkIfFavorite(event.title),
+                    onFavoriteChanged = { isFavorite ->
+                        if (isFavorite) {
+                            addToFavorites(event, foundMarker.position.latitude, foundMarker.position.longitude)
+                        } else {
+                            removeFromFavorites(event.title)
+                        }
+                    }
                 )
                 bottomSheet.show(supportFragmentManager, "PlaceBottomSheet")
             }
@@ -320,6 +439,11 @@ class MainActivity : AppCompatActivity() {
             Log.d("Search", "Nie znaleziono wydarzenia: $query")
             Toast.makeText(this, "Brak wyników dla: $query", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(searchBar.windowToken, 0)
     }
 
 }
@@ -331,4 +455,17 @@ data class EventData(
     val wikiURL: String,
     val type: String,
     val epoch: String
+)
+
+data class FavoriteEvent(
+    val userId: String = "",
+    val eventId: String = "",
+    val title: String = "",
+    val description: String = "",
+    val imageURL: String = "",
+    val wikiURL: String = "",
+    val type: String = "",
+    val epoch: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
 )

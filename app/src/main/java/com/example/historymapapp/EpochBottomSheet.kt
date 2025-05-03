@@ -42,26 +42,26 @@ class EpochBottomSheet(
         titleTextView.text = "Choosing an epoch"
 
         ancientButton.setOnClickListener {
-            toggleEpochSelection("Ancient", ancientButton)
+            toggleEpochSelection("Ancient History", ancientButton)
         }
 
         middleButton.setOnClickListener {
-            toggleEpochSelection("Middle", middleButton)
+            toggleEpochSelection("Middle Ages", middleButton)
         }
 
         modernButton.setOnClickListener {
-            toggleEpochSelection("Modern", modernButton)
+            toggleEpochSelection("Modern History", modernButton)
         }
 
         selectedEpochs.addAll(preselectedEpochs)
 
-        if (selectedEpochs.contains("Ancient")) {
+        if (selectedEpochs.contains("Ancient History")) {
             ancientButton.setBackgroundResource(R.drawable.epoch_button_selected)
         }
-        if (selectedEpochs.contains("Middle")) {
+        if (selectedEpochs.contains("Middle Ages")) {
             middleButton.setBackgroundResource(R.drawable.epoch_button_selected)
         }
-        if (selectedEpochs.contains("Modern")) {
+        if (selectedEpochs.contains("Modern History")) {
             modernButton.setBackgroundResource(R.drawable.epoch_button_selected)
         }
     }

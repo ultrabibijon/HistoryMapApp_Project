@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -21,10 +22,13 @@ class PlaceBottomSheet(
     private val imageURL: String,
     private val wikiURL: String,
     private val lat: Double,
-    private val lon: Double
+    private val lon: Double,
+    private val isFavorite: Boolean = false,
+    private val onFavoriteChanged: (isFavorite: Boolean) -> Unit
 ) : BottomSheetDialogFragment() {
 
     private lateinit var behavior: BottomSheetBehavior<View>
+    private var currentFavoriteState = isFavorite
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +64,22 @@ class PlaceBottomSheet(
             startActivity(intent)
         }
         wikiLabelTextView.text = "Learn more about $title:"
+
+        val favoriteButton = view.findViewById<ImageButton>(R.id.favorite_button)
+        updateFavoriteButton(favoriteButton)
+
+        favoriteButton.setOnClickListener {
+            currentFavoriteState = !currentFavoriteState
+            updateFavoriteButton(favoriteButton)
+            onFavoriteChanged(currentFavoriteState)
+        }
+    }
+
+    private fun updateFavoriteButton(button: ImageButton) {
+        button.setImageResource(
+            if (currentFavoriteState) R.drawable.ic_favorite_filled
+            else R.drawable.ic_favorite_empty
+        )
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
