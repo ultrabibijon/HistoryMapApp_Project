@@ -15,6 +15,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.core.net.toUri
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class PlaceBottomSheet(
     private val title: String,
@@ -23,12 +26,11 @@ class PlaceBottomSheet(
     private val wikiURL: String,
     private val lat: Double,
     private val lon: Double,
-    private val isFavorite: Boolean = false,
     private val onFavoriteChanged: (isFavorite: Boolean) -> Unit
 ) : BottomSheetDialogFragment() {
 
     private lateinit var behavior: BottomSheetBehavior<View>
-    private var currentFavoriteState = isFavorite
+    private var currentFavoriteState = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,13 +51,13 @@ class PlaceBottomSheet(
         val imageView = view.findViewById<ImageView>(R.id.place_image)
         val wikiLabelTextView = view.findViewById<TextView>(R.id.wikipedia_label)
         val wikiTextView = view.findViewById<TextView>(R.id.place_wikipedia)
+        val favoriteButton = view.findViewById<ImageButton>(R.id.favorite_button)
 
         titleTextView.text = title
         descriptionTextView.text = description
 
         Glide.with(requireContext())
             .load(imageURL)
-            //.placeholder(R.drawable.placeholder_image)
             .into(imageView)
 
         wikiTextView.text = wikiURL
@@ -65,8 +67,7 @@ class PlaceBottomSheet(
         }
         wikiLabelTextView.text = "Learn more about $title:"
 
-        val favoriteButton = view.findViewById<ImageButton>(R.id.favorite_button)
-        updateFavoriteButton(favoriteButton)
+        loadFavoriteStatus(title, favoriteButton)
 
         favoriteButton.setOnClickListener {
             currentFavoriteState = !currentFavoriteState
@@ -75,12 +76,27 @@ class PlaceBottomSheet(
         }
     }
 
+
     private fun updateFavoriteButton(button: ImageButton) {
         button.setImageResource(
             if (currentFavoriteState) R.drawable.ic_favorite_filled
             else R.drawable.ic_favorite_empty
         )
     }
+
+    private fun loadFavoriteStatus(title: String, button: ImageButton) {
+        val userId = Firebase.auth.currentUser?.uid ?: return
+        val ref = Firebase.database("https://historymapapp-2e0cb-default-rtdb.europe-west1.firebasedatabase.app/")
+            .getReference("favorites")
+            .child(userId)
+            .child(title)
+
+        ref.get().addOnSuccessListener { snapshot ->
+            currentFavoriteState = snapshot.exists()
+            updateFavoriteButton(button)
+        }
+    }
+
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = BottomSheetDialog(requireContext(), theme)

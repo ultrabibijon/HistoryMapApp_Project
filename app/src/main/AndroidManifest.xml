@@ -32,6 +32,11 @@
         <activity
             android:name=".FavoritesActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".RecentActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

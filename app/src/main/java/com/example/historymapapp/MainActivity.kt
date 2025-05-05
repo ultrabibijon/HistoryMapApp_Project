@@ -187,8 +187,8 @@ class MainActivity : AppCompatActivity() {
 
         // Przcycisk - przejście do ostatnio oglądanych
         btnRecent.setOnClickListener {
-            Toast.makeText(this, "Ostatnio oglądane", Toast.LENGTH_SHORT).show()
-            // TODO: pokaż historię
+            val intent = Intent(this, RecentActivity::class.java)
+            startActivity(intent)
         }
 
         // Przycisk - przejście do informacji o aplikacji
@@ -216,6 +216,9 @@ class MainActivity : AppCompatActivity() {
                     markerList.firstOrNull { marker -> marker.title == title }?.let { marker ->
                         val event = marker.relatedObject as? EventData
                         if (event != null) {
+
+                            addToRecentEvents(event, marker.position.latitude, marker.position.longitude)
+
                             val bottomSheet = PlaceBottomSheet(
                                 event.title,
                                 event.description,
@@ -223,7 +226,6 @@ class MainActivity : AppCompatActivity() {
                                 event.wikiURL,
                                 marker.position.latitude,
                                 marker.position.longitude,
-                                isFavorite = true,
                                 onFavoriteChanged = { isFavorite ->
                                     if (isFavorite) {
                                         addToFavorites(event, marker.position.latitude, marker.position.longitude)
@@ -305,6 +307,9 @@ class MainActivity : AppCompatActivity() {
 
                 val event = clickedMarker.relatedObject as? EventData
                 if (event != null) {
+
+                    addToRecentEvents(event, clickedMarker.position.latitude, clickedMarker.position.longitude)
+
                     val bottomSheet = PlaceBottomSheet(
                         event.title,
                         event.description,
@@ -312,7 +317,6 @@ class MainActivity : AppCompatActivity() {
                         event.wikiURL,
                         clickedMarker.position.latitude,
                         clickedMarker.position.longitude,
-                        isFavorite = checkIfFavorite(event.title),
                         onFavoriteChanged = { isFavorite ->
                             if (isFavorite) {
                                 addToFavorites(event, clickedMarker.position.latitude, clickedMarker.position.longitude)
@@ -381,6 +385,42 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    private fun addToRecentEvents(event: EventData, lat: Double, lon: Double) {
+        val userId = auth.currentUser?.uid ?: return
+        val recentEvent = RecentEvent(
+            userId = userId,
+            eventId = event.title,
+            title = event.title,
+            description = event.description,
+            imageURL = event.imageURL,
+            wikiURL = event.wikiURL,
+            type = event.type,
+            epoch = event.epoch,
+            latitude = lat,
+            longitude = lon,
+            timestamp = System.currentTimeMillis()
+        )
+
+        database.child("recent_events").child(userId).child(event.title).setValue(recentEvent)
+            .addOnSuccessListener {
+                // Ogranicz do 5 rekordów
+                database.child("recent_events").child(userId)
+                    .orderByChild("timestamp")
+                    .limitToFirst(1)
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.children.count() > 5) {
+                                snapshot.children.firstOrNull()?.ref?.removeValue()
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            Log.e("Firebase", "Błąd przy ograniczaniu historii", error.toException())
+                        }
+                    })
+            }
+    }
+
     private fun filterMarkersByEpoch(selectedEpochs: Set<String>) {
         map.overlays.clear()
 
@@ -416,6 +456,9 @@ class MainActivity : AppCompatActivity() {
 
             val event = foundMarker.relatedObject as? EventData
             if (event != null) {
+
+                addToRecentEvents(event, foundMarker.position.latitude, foundMarker.position.longitude)
+
                 val bottomSheet = PlaceBottomSheet(
                     event.title,
                     event.description,
@@ -423,7 +466,6 @@ class MainActivity : AppCompatActivity() {
                     event.wikiURL,
                     foundMarker.position.latitude,
                     foundMarker.position.longitude,
-                    isFavorite = checkIfFavorite(event.title),
                     onFavoriteChanged = { isFavorite ->
                         if (isFavorite) {
                             addToFavorites(event, foundMarker.position.latitude, foundMarker.position.longitude)
@@ -468,4 +510,18 @@ data class FavoriteEvent(
     val epoch: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0
+)
+
+data class RecentEvent(
+    val userId: String = "",
+    val eventId: String = "",
+    val title: String = "",
+    val description: String = "",
+    val imageURL: String = "",
+    val wikiURL: String = "",
+    val type: String = "",
+    val epoch: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+    val timestamp: Long = System.currentTimeMillis()
 )
