@@ -47,6 +47,11 @@ class FavoritesActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
+        val cachedFavorites = AppCache.getCachedFavorites(this)
+        if (cachedFavorites.isNotEmpty()) {
+            adapter.updateData(cachedFavorites)
+        }
+
         loadFavorites()
     }
 

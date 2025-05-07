@@ -40,6 +40,11 @@ class RecentActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
+        val cachedRecent = AppCache.getCachedRecentEvents(this)
+        if (cachedRecent.isNotEmpty()) {
+            adapter.updateData(cachedRecent.reversed())
+        }
+
         loadRecentEvents()
     }
 

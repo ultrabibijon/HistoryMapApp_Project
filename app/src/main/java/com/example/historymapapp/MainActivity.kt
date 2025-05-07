@@ -137,6 +137,14 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        if (intent?.getBooleanExtra("from_splash", true) == true) {
+            val cachedMarkers = AppCache.getCachedMarkers(this)
+            cachedMarkers.forEach { (lat, lon, event) ->
+                addMarker(lat, lon, event.title, event.description,
+                    event.imageURL, event.wikiURL, event.type, event.epoch)
+            }
+        }
+
         getMarkersFromFirestore()
 
         // Obsługa wyszukiwarki
@@ -245,8 +253,6 @@ class MainActivity : AppCompatActivity() {
 
     // Funkcja pobierająca dane z Firestore
     private fun getMarkersFromFirestore() {
-        map.overlays.clear()
-        markerList.clear()
 
         db.collection("historical_events")
             .get()

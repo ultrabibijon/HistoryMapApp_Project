@@ -15,14 +15,11 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.osmdroid.config.Configuration
-import org.osmdroid.views.MapView
 import java.util.concurrent.atomic.AtomicInteger
-
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
 
-    private lateinit var mapView: MapView
     private val firestore = Firebase.firestore
     private val database = Firebase.database("https://historymapapp-2e0cb-default-rtdb.europe-west1.firebasedatabase.app/")
     private val userId = Firebase.auth.currentUser?.uid
@@ -31,91 +28,94 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
         setContentView(R.layout.splash_activity)
 
-        // Inicjalizacja MapView
-        mapView = MapView(this)
-        mapView.setTileSource(org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK)
+        Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
 
         preloadData()
     }
 
     private fun preloadData() {
         loadFirestoreMarkers()
-        loadFavorites()
-        loadRecentEvents()
+        if (userId != null) {
+            loadFavorites()
+            loadRecentEvents()
+        } else {
+            tasksCompleted.addAndGet(2)
+        }
     }
 
     private fun onTaskFinished() {
         if (tasksCompleted.incrementAndGet() == totalTasks) {
-            Handler(Looper.getMainLooper()).postDelayed({
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            }, 1000)
+            navigateToMain()
         }
     }
 
+    private fun navigateToMain() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent(this, MainActivity::class.java).apply {
+                putExtra("from_splash", true)
+            })
+            finish()
+        }, 1000)
+    }
+
     private fun loadFirestoreMarkers() {
-        firestore.collection("historical_events")
-            .get()
+        firestore.collection("historical_events").get()
             .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val lat = document.getDouble("Latitude") ?: 0.0
-                    val lon = document.getDouble("Longitude") ?: 0.0
-                    val title = document.getString("Name of Incident") ?: "Nieznane miejsce"
-                    val description = document.getString("Describe Event") ?: "Brak opisu"
-                    val imageURL = document.getString("imageURL") ?: ""
-                    val wikiURL = document.getString("wikiURL") ?: ""
-                    val type = document.getString("Type of Event") ?: "other"
-                    val epoch = document.getString("Epoch") ?: "other"
+                val markers = documents.map { doc ->
+                    Triple(
+                        doc.getDouble("Latitude") ?: 0.0,
+                        doc.getDouble("Longitude") ?: 0.0,
+                        EventData(
+                            title = doc.getString("Name of Incident") ?: "",
+                            description = doc.getString("Describe Event") ?: "",
+                            imageURL = doc.getString("imageURL") ?: "",
+                            wikiURL = doc.getString("wikiURL") ?: "",
+                            type = doc.getString("Type of Event") ?: "other",
+                            epoch = doc.getString("Epoch") ?: "other"
+                        )
+                    )
                 }
+                AppCache.saveMarkers(this, markers)
                 onTaskFinished()
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Błąd ładowania markerów", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error loading map data", Toast.LENGTH_SHORT).show()
                 onTaskFinished()
             }
     }
 
     private fun loadFavorites() {
-        if (userId == null) {
-            onTaskFinished(); return
-        }
-
-        database.reference.child("favorites").child(userId)
+        database.reference.child("favorites").child(userId!!)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    for (child in snapshot.children) {
-                        val favorite = child.getValue(FavoriteEvent::class.java)
+                    val favorites = snapshot.children.mapNotNull {
+                        it.getValue(FavoriteEvent::class.java)
                     }
+                    AppCache.saveFavorites(this@SplashActivity, favorites)
                     onTaskFinished()
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@SplashActivity, "Błąd ładowania ulubionych", Toast.LENGTH_SHORT).show()
                     onTaskFinished()
                 }
             })
     }
 
     private fun loadRecentEvents() {
-        if (userId == null) {
-            onTaskFinished(); return
-        }
-
-        database.reference.child("recent_events").child(userId)
+        database.reference.child("recent_events").child(userId!!)
             .orderByChild("timestamp").limitToLast(5)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    for (child in snapshot.children) {
-                        val event = child.getValue(RecentEvent::class.java)
+                    val recentEvents = snapshot.children.mapNotNull {
+                        it.getValue(RecentEvent::class.java)
                     }
+                    AppCache.saveRecentEvents(this@SplashActivity, recentEvents)
                     onTaskFinished()
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@SplashActivity, "Błąd ładowania historii", Toast.LENGTH_SHORT).show()
                     onTaskFinished()
                 }
             })

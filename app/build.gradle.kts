@@ -56,6 +56,9 @@ dependencies {
     // Glide - images
     implementation(libs.glide)
 
+    // JSON library
+    implementation (libs.google.gson)
+
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.database)
