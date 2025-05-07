@@ -201,8 +201,8 @@ class MainActivity : AppCompatActivity() {
 
         // Przycisk - przejście do informacji o aplikacji
         btnAbout.setOnClickListener {
-            Toast.makeText(this, "O aplikacji", Toast.LENGTH_SHORT).show()
-            // TODO: otwórz info
+            val intent = Intent(this, AboutActivity::class.java)
+            startActivity(intent)
         }
 
         // Przycisk - przejścoe do ustawień
