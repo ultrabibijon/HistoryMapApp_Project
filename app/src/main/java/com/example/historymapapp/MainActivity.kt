@@ -337,19 +337,6 @@ class MainActivity : AppCompatActivity() {
         markerList.add(marker)
     }
 
-    private fun checkIfFavorite(eventTitle: String): Boolean {
-        val userId = auth.currentUser?.uid ?: return false
-        var isFavorite = false
-        database.child("favorites").child(userId).child(eventTitle)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    isFavorite = snapshot.exists()
-                }
-                override fun onCancelled(error: DatabaseError) {}
-            })
-        return isFavorite
-    }
-
     private fun addToFavorites(event: EventData, lat: Double, lon: Double) {
         val userId = auth.currentUser?.uid ?: return
         val favorite = FavoriteEvent(
