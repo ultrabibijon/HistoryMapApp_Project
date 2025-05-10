@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".NoteEditorActivity">
+
+    <EditText
+        android:id="@+id/edit_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Tytuł notatki"
+        android:minHeight="48dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/edit_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:hint="Treść notatki..."
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        android:minLines="10"
+        android:overScrollMode="always"
+        app:layout_constraintTop_toBottomOf="@id/edit_title"
+        app:layout_constraintBottom_toTopOf="@id/button_save"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/button_save"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Dodaj notatkę"
+        android:textColor="@android:color/black"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
