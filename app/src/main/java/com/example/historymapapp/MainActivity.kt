@@ -189,8 +189,8 @@ class MainActivity : AppCompatActivity() {
 
         // Przycisk - przejście do notatek
         btnNotes.setOnClickListener {
-            Toast.makeText(this, "Notatki", Toast.LENGTH_SHORT).show()
-            // TODO: otwórz notatki
+            val intent = Intent(this, NotesActivity::class.java)
+            startActivity(intent)
         }
 
         // Przcycisk - przejście do ostatnio oglądanych

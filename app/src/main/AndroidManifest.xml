@@ -45,6 +45,15 @@
             android:name=".AboutActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".NotesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".NoteEditorActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"/>
+
     </application>
 
 </manifest>
