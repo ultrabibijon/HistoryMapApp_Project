@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private val db = Firebase.firestore
     private val markerList = mutableListOf<Marker>()
     private var selectedEpochsGlobal: Set<String> = emptySet()
+    private var selectedTypesGlobal: Set<String> = emptySet()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val btnFilter = findViewById<ImageButton>(R.id.btn_filter)
+        val btnFilterType = findViewById<ImageButton>(R.id.btn_filter_type)
         val btnFavorite = findViewById<ImageButton>(R.id.btn_favorite)
         val btnNotes = findViewById<ImageButton>(R.id.btn_notes)
         val btnRecent = findViewById<ImageButton>(R.id.btn_recent)
@@ -98,10 +100,22 @@ class MainActivity : AppCompatActivity() {
                 preselectedEpochs = selectedEpochsGlobal,
                 onEpochSelected = { selected ->
                     selectedEpochsGlobal = selected
-                    filterMarkersByEpoch(selected)
+                    filterMarkers()
                 }
             )
             filterBottomSheet.show(supportFragmentManager, "EpochFilterBottomSheet")
+        }
+
+        // Przycisk - filtrowanie według typu
+        btnFilterType.setOnClickListener {
+            val filterTypeBottomSheet = TypeBottomSheet(
+                preselectedTypes = selectedTypesGlobal,
+                onTypesSelected = { selected ->
+                    selectedTypesGlobal = selected
+                    filterMarkers()
+                }
+            )
+            filterTypeBottomSheet.show(supportFragmentManager, "TypeBottomSheet")
         }
 
         // Przycisk - przybliżenie mapy
@@ -116,7 +130,7 @@ class MainActivity : AppCompatActivity() {
 
         map.apply {
             setTileSource(TileSourceFactory.MAPNIK)
-            controller.setZoom(10.0)
+            controller.setZoom(5.0)
             controller.setCenter(GeoPoint(52.2298, 21.0122))
             minZoomLevel = 4.0
             maxZoomLevel = 15.0
@@ -414,20 +428,27 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun filterMarkersByEpoch(selectedEpochs: Set<String>) {
+    private fun filterMarkers() {
         map.overlays.clear()
 
         for (marker in markerList) {
             val event = marker.relatedObject as? EventData
             if (event != null) {
-                if (selectedEpochs.isEmpty() || selectedEpochs.contains(event.epoch)) {
+                val epochMatch = selectedEpochsGlobal.isEmpty() || selectedEpochsGlobal.contains(event.epoch)
+                val typeMatch = selectedTypesGlobal.isEmpty() ||
+                        selectedTypesGlobal.any { type ->
+                            event.type.equals(type, ignoreCase = true) ||
+                                    (type == "disaster" && (event.type.equals("industrial disaster", ignoreCase = true) ||
+                                            event.type.equals("nature disaster", ignoreCase = true)))
+                        }
+
+                if (epochMatch && typeMatch) {
                     map.overlays.add(marker)
                 }
             }
         }
         map.invalidate()
     }
-
 
     // Funkcja do przybliżenia mapy na dany punkt
     private fun focusOnMarker(lat: Double, lon: Double) {
