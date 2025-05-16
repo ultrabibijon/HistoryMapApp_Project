@@ -1,0 +1,12 @@
+<resources>
+    <color name="background">#121212</color>
+    <color name="primary_text">#FFFFFF</color>
+    <color name="secondary_text">#BBBBBB</color>
+    <color name="divider">#333333</color>
+    <color name="link">#77AAFF</color>
+    <color name="icon_tint">@color/primary_text</color>
+    <color name="drag_handle">#555555</color> <!-- ciemniejszy szary do dark mode -->
+    <color name="blue">#1565C0</color>
+
+
+</resources>

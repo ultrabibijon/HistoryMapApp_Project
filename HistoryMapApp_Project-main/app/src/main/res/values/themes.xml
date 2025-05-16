@@ -1,0 +1,22 @@
+<!--<resources xmlns:tools="http://schemas.android.com/tools">-->
+<!--    &lt;!&ndash; Base application theme. &ndash;&gt;-->
+<!--    <style name="Base.Theme.HistoryMapApp" parent="Theme.Material3.DayNight.NoActionBar">-->
+<!--        &lt;!&ndash; Customize your light theme here. &ndash;&gt;-->
+<!--        &lt;!&ndash; <item name="colorPrimary">@color/my_light_primary</item> &ndash;&gt;-->
+<!--    </style>-->
+
+<!--    <style name="Theme.HistoryMapApp" parent="Base.Theme.HistoryMapApp" />-->
+<!--</resources>-->
+
+
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.HistoryMapApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/blue</item>
+        <item name="colorOnPrimary">@color/primary_text</item>
+        <item name="colorSurface">@color/background</item>
+        <item name="colorOnSurface">@color/primary_text</item>
+        <!-- Dodaj inne elementy wg potrzeb -->
+    </style>
+    <style name="Theme.HistoryMapApp" parent="Base.Theme.HistoryMapApp" />
+</resources>
