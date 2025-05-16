@@ -2,6 +2,7 @@ package com.example.historymapapp
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.EditorInfo
@@ -22,6 +23,7 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -30,6 +32,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,10 +41,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
     private lateinit var searchBar: EditText
+    private lateinit var locationOverlay: MyLocationNewOverlay
     private val db = Firebase.firestore
     private val markerList = mutableListOf<Marker>()
     private var selectedEpochsGlobal: Set<String> = emptySet()
     private var selectedTypesGlobal: Set<String> = emptySet()
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +60,7 @@ class MainActivity : AppCompatActivity() {
 
         val btnFilter = findViewById<ImageButton>(R.id.btn_filter)
         val btnFilterType = findViewById<ImageButton>(R.id.btn_filter_type)
+        val btnLocation = findViewById<ImageButton>(R.id.btn_my_location)
         val btnFavorite = findViewById<ImageButton>(R.id.btn_favorite)
         val btnNotes = findViewById<ImageButton>(R.id.btn_notes)
         val btnRecent = findViewById<ImageButton>(R.id.btn_recent)
@@ -92,6 +99,11 @@ class MainActivity : AppCompatActivity() {
 
         map = findViewById(R.id.map)
 
+        // Inicjalizacja lokalizacji
+        locationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(applicationContext), map)
+        locationOverlay.enableMyLocation()
+        map.overlays.add(locationOverlay)
+
         // Przyciski na mapie
 
         // Przycisk - filtrowanie według epoki
@@ -116,6 +128,11 @@ class MainActivity : AppCompatActivity() {
                 }
             )
             filterTypeBottomSheet.show(supportFragmentManager, "TypeBottomSheet")
+        }
+
+        // Przycisk - wyszukiwanie użytkownika na mapie
+        btnLocation.setOnClickListener {
+            centerOnUserLocation()
         }
 
         // Przycisk - przybliżenie mapy
@@ -500,6 +517,61 @@ class MainActivity : AppCompatActivity() {
     private fun hideKeyboard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(searchBar.windowToken, 0)
+    }
+
+
+    // Funkcje obsługi lokalizacji
+    private fun centerOnUserLocation() {
+        if (checkLocationPermission()) {
+            locationOverlay.enableFollowLocation()
+            locationOverlay.enableMyLocation()
+            val myLocation = locationOverlay.myLocation
+            if (myLocation != null) {
+                map.controller.animateTo(myLocation, 15.0, 3000L)
+                map.controller.setZoom(15.0)
+            } else {
+                Toast.makeText(this, "Poszukiwanie lokalizacji, proszę czekać", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            requestLocationPermission()
+        }
+    }
+
+    private fun checkLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestLocationPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            LOCATION_PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                centerOnUserLocation()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Brak uprawnień do lokalizacji - funkcja niedostępna",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
 }
