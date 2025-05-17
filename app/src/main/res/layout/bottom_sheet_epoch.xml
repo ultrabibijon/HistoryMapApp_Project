@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -12,7 +11,7 @@
         android:id="@+id/drag_handle"
         android:layout_width="30dp"
         android:layout_height="4dp"
-        android:background="@android:color/darker_gray"
+        android:background="@color/drag_handle"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp" />
 
@@ -32,9 +31,11 @@
             android:text="Choosing an epoch"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="@color/primary_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Pozostałe elementy bez zmian, ale możesz dodać textColor tam gdzie chcesz -->
         <ImageButton
             android:id="@+id/btn_ancient"
             android:layout_width="78dp"
@@ -82,6 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Ancient History"
+            android:textColor="@color/primary_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_ancient" />
 
@@ -92,6 +94,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
             android:text="Middle Ages"
+            android:textColor="@color/primary_text"
             app:layout_constraintEnd_toStartOf="@+id/modern_text"
             app:layout_constraintStart_toEndOf="@+id/ancient_text"
             app:layout_constraintTop_toBottomOf="@+id/btn_middle" />
@@ -102,9 +105,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Modern History"
+            android:textColor="@color/primary_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_modern" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

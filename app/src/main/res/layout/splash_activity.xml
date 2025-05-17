@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/background"
     tools:context=".SplashActivity">
 
     <ImageView
@@ -39,7 +39,7 @@
         android:layout_marginBottom="150dp"
         android:gravity="center"
         android:text="Witaj w Mapie Historycznej – wyrusz w podróż przez czas"
-        android:textColor="#575656"
+        android:textColor="@color/secondary_text"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

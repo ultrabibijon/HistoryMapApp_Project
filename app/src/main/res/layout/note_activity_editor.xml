@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="@android:color/white"
+    android:background="@color/background"
     tools:context=".NoteEditorActivity">
 
     <com.google.android.material.textfield.TextInputLayout
@@ -30,7 +30,8 @@
             android:layout_height="wrap_content"
             android:hint="Tytuł notatki"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="@color/primary_text"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -57,7 +58,8 @@
             android:gravity="top"
             android:inputType="textMultiLine"
             android:minLines="10"
-            android:overScrollMode="always"/>
+            android:overScrollMode="always"
+            android:textColor="@color/primary_text"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -65,13 +67,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Dodaj notatkę"
-        android:textColor="@android:color/black"
-        android:backgroundTint="@android:color/white"
-        app:strokeColor="@android:color/darker_gray"
+        android:textColor="@color/primary_text"
+        android:backgroundTint="@color/background"
+        app:strokeColor="@color/divider"
         app:strokeWidth="1dp"
         app:cornerRadius="16dp"
         app:iconPadding="8dp"
-        app:iconTint="@android:color/black"
+        app:iconTint="@color/primary_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
