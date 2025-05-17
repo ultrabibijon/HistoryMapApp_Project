@@ -24,6 +24,8 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -40,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var map: MapView
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
+    private lateinit var analytics: FirebaseAnalytics
     private lateinit var searchBar: EditText
     private lateinit var locationOverlay: MyLocationNewOverlay
     private val db = Firebase.firestore
@@ -57,6 +60,9 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        // Firebase Analytics
+        analytics = Firebase.analytics
 
         val btnFilter = findViewById<ImageButton>(R.id.btn_filter)
         val btnFilterType = findViewById<ImageButton>(R.id.btn_filter_type)
@@ -469,6 +475,8 @@ class MainActivity : AppCompatActivity() {
 
     // Funkcja do przybliżenia mapy na dany punkt
     private fun focusOnMarker(lat: Double, lon: Double) {
+        locationOverlay.disableFollowLocation()
+
         val geoPoint = GeoPoint(lat, lon)
         map.controller.animateTo(geoPoint)
         map.controller.setZoom(15.0)
@@ -476,6 +484,8 @@ class MainActivity : AppCompatActivity() {
 
     // Funkcja wyszukiwania wydarzenia po nazwie
     private fun searchForEvent(query: String) {
+        locationOverlay.disableFollowLocation()
+
         val foundMarker = markerList.firstOrNull {
             it.title?.contains(query, ignoreCase = true) == true
         }

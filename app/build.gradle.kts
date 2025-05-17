@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
 }
 
 android {
@@ -25,6 +27,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -64,5 +67,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
-
+    implementation (libs.google.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.perf)
 }

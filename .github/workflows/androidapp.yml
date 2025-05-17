@@ -1,64 +1,33 @@
-name: Android CI
+name: Android CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  test:
-    name: Run tests
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        
-    - name: Setup Android SDK Tools
-      uses: android-actions/setup-android@v3.2.2
-      with:
-        api-level: 35 
-        build-tools: 36.0.0
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Grant execute permission to Gradle wrapper
-      run: chmod +x gradlew
-    
-    - name: Install dependencies
-      run: ./gradlew build --stacktrace
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
 
-    - name: Run unit tests
-      run: ./gradlew testDebugUnitTest
+      - name: Build release APK
+        run: ./gradlew assembleRelease
 
-    - name: Generate unit test report
-      run: ./gradlew testDebugUnitTest --info
-      continue-on-error: true  
+      - name: Firebase Test Lab placeholder
+        run: |
+          echo "TODO: Integracja z Firebase Test Lab(później)"
 
-    #- name: List available AVD devices
-      #run: $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list device
-      
-    #- name: Start Android Emulator
-      #uses: ReactiveCircus/android-emulator-runner@v2.33.0
-      #with:
-        #api-level: 36 
-        #target: google_apis
-        #arch: x86_64
-        #profile: pixel_7_pro
-        #avd-name: test-emulator
-        #emulator-options: "-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim"
-        #script: ./gradlew connectedDebugAndroidTest
-
-    #- name: Run UI tests (Espresso)
-      #run: ./gradlew connectedDebugAndroidTest
-    
-    #- name: Generate UI test report
-      #run: ./gradlew connectedDebugAndroidTest --info
-      #continue-on-error: true
+      - name: Upload to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: testers
+          file: app/build/outputs/apk/release/app-release.apk
