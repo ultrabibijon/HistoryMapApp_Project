@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">HistoryMapApp</string>
+    <string name="theme_title">Wybierz motyw</string>
+    <string name="theme_system">Systemowy</string>
+    <string name="theme_light">Jasny</string>
+    <string name="theme_dark">Ciemny</string>
 </resources>
