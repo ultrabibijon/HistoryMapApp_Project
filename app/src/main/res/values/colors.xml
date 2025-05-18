@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#FFFFFF</color>
+    <color name="primary_text">#000000</color>
+    <color name="secondary_text">#808080</color>
+    <color name="divider">#DDDDDD</color>
+    <color name="link">#0066CC</color>
+    <color name="icon_tint">@color/primary_text</color>
+    <color name="drag_handle">#BDBDBD</color>
+    <color name="blue">#2196F3</color>
+    <color name="switch_thumb_off">#000000</color>
+    <color name="switch_thumb_on">@color/blue</color>
+    <color name="switch_track_off">#E0E0E0</color>
+    <color name="switch_track_on">#BBDEFB</color>
+</resources>
