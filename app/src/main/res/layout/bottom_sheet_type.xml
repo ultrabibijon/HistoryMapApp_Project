@@ -10,18 +10,16 @@
     android:padding="16dp"
     tools:context=".TypeBottomSheet">
 
-    <!-- Drag Handle -->
     <View
         android:id="@+id/drag_handle"
         android:layout_width="36dp"
         android:layout_height="4dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/drag_handle_bg"
+        android:background="@color/drag_handle"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Title -->
     <TextView
         android:id="@+id/event_type_title"
         android:layout_width="0dp"
@@ -31,11 +29,11 @@
         android:textStyle="bold"
         android:text="Filter by event type"
         android:gravity="center"
+        android:textColor="@color/primary_text"
         app:layout_constraintTop_toBottomOf="@id/drag_handle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Switch Container -->
     <LinearLayout
         android:id="@+id/event_types_container"
         android:layout_width="0dp"
@@ -64,8 +62,11 @@
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch_battle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:minHeight="48dp"
                 android:text="Battle"
+                android:textColor="@color/primary_text"
+                android:theme="@style/SwitchStyle"
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
         </LinearLayout>
 
@@ -87,8 +88,11 @@
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch_political"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:minHeight="48dp"
                 android:text="Political"
+                android:textColor="@color/primary_text"
+                android:theme="@style/SwitchStyle"
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
         </LinearLayout>
 
@@ -110,8 +114,11 @@
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch_terrorism"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:minHeight="48dp"
                 android:text="Terrorism"
+                android:textColor="@color/primary_text"
+                android:theme="@style/SwitchStyle"
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
         </LinearLayout>
 
@@ -133,8 +140,11 @@
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch_disaster"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:minHeight="48dp"
                 android:text="Disaster"
+                android:textColor="@color/primary_text"
+                android:theme="@style/SwitchStyle"
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
         </LinearLayout>
 
@@ -156,8 +166,11 @@
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch_sport"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:minHeight="48dp"
                 android:text="Sport"
+                android:textColor="@color/primary_text"
+                android:theme="@style/SwitchStyle"
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
         </LinearLayout>
 
@@ -179,8 +192,11 @@
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch_science"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:minHeight="48dp"
                 android:text="Science"
+                android:textColor="@color/primary_text"
+                android:theme="@style/SwitchStyle"
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
         </LinearLayout>
     </LinearLayout>

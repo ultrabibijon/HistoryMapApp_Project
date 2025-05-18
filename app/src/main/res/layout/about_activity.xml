@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/white"
+    android:background="@color/background"
     tools:context=".AboutActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/about_toolbar"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:background="@android:color/white"
+        android:background="@color/background"
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:text="O aplikacji"
-            android:textColor="@android:color/black"
+            android:textColor="@color/primary_text"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -42,6 +42,7 @@
             android:padding="12dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_arrow_back"
+            app:tint="?attr/colorControlNormal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +52,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#DDDDDD" />
+        android:background="@color/divider" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -68,6 +69,7 @@
                 android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="24dp"
+                android:contentDescription="Logo"
                 android:src="@drawable/ic_logo" />
 
             <TextView
@@ -75,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:text="HistoryMap"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"
+                android:textColor="@color/primary_text"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
@@ -85,16 +87,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:textColor="#808080"
+                android:textColor="@color/secondary_text"
                 android:textSize="14sp"
                 android:layout_marginBottom="24dp"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Autor: Vladyslav Papanov"
+                android:text="Autorzy: Vladyslav Papanov, Paweł Bała"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 android:layout_marginBottom="16dp"/>
 
@@ -103,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:text="Aplikacja HistoryMap to interaktywna mapa historycznych wydarzeń, pozwalająca na eksplorację ważnych momentów w historii świata."
                 android:textAlignment="center"
-                android:textColor="@android:color/black"
+                android:textColor="@color/primary_text"
                 android:textSize="14sp"
                 android:lineSpacingExtra="4dp"
                 android:layout_marginBottom="24dp"/>
@@ -114,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:text="Wykorzystane biblioteki:"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 android:layout_marginBottom="8dp"/>
 
@@ -122,7 +124,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="• OSMDroid - biblioteka mapowa\n• Glide - ładowanie obrazów\n• Gson - parsowanie JSON\n• Firebase - baza danych i autentykacja"
-                android:textColor="@android:color/black"
+                android:textColor="@color/primary_text"
                 android:textSize="14sp"
                 android:lineSpacingExtra="4dp"
                 android:layout_marginBottom="16dp"/>
@@ -132,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:text="Linki do bibliotek:"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 android:layout_marginBottom="8dp"/>
 
@@ -144,7 +146,7 @@
                 android:focusable="true"
                 android:minHeight="48dp"
                 android:text="• OSMDroid: https://github.com/osmdroid/osmdroid"
-                android:textColor="#0066CC"
+                android:textColor="@color/link"
                 android:textSize="14sp" />
 
             <TextView
@@ -156,7 +158,7 @@
                 android:focusable="true"
                 android:minHeight="48dp"
                 android:text="• Glide: https://github.com/bumptech/glide"
-                android:textColor="#0066CC"
+                android:textColor="@color/link"
                 android:textSize="14sp" />
 
             <TextView
@@ -168,7 +170,7 @@
                 android:focusable="true"
                 android:minHeight="48dp"
                 android:text="• Gson: https://github.com/google/gson"
-                android:textColor="#0066CC"
+                android:textColor="@color/link"
                 android:textSize="14sp" />
 
             <TextView
@@ -180,7 +182,7 @@
                 android:focusable="true"
                 android:minHeight="48dp"
                 android:text="• Firebase: https://firebase.google.com/"
-                android:textColor="#0066CC"
+                android:textColor="@color/link"
                 android:textSize="14sp" />
 
             <TextView
@@ -196,7 +198,7 @@
                 android:minHeight="48dp"
                 android:paddingBottom="25dp"
                 android:text="Polityka prywatności"
-                android:textColor="#0066CC"
+                android:textColor="@color/link"
                 android:textSize="14sp" />
 
         </LinearLayout>
