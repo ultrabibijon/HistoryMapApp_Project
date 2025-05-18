@@ -67,7 +67,6 @@
                 card_view:tint="?attr/colorOnSurface" />
         </LinearLayout>
 
-        <!-- Expanded options layout -->
         <LinearLayout
             android:id="@+id/theme_options_layout"
             android:layout_width="match_parent"

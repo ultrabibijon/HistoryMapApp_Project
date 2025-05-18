@@ -68,7 +68,7 @@ class FavoritesActivity : AppCompatActivity() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@FavoritesActivity, "Błąd ładowania ulubionych", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@FavoritesActivity, "Error loading favorites", Toast.LENGTH_SHORT).show()
                 }
             })
     }

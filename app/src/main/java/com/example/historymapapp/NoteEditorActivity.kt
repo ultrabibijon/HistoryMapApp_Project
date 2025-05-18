@@ -50,7 +50,7 @@ class NoteEditorActivity : AppCompatActivity() {
             .reference.child("notes").child(userId).child(id)
             .setValue(note)
             .addOnSuccessListener {
-                Toast.makeText(this, "Notatka zapisana", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show()
                 finish()
             }
             .addOnFailureListener {

@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:text="O aplikacji"
+            android:text="About the app"
             android:textColor="@color/primary_text"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -37,7 +37,7 @@
             android:layout_marginTop="15dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
-            android:contentDescription="Powrót"
+            android:contentDescription="Back"
             android:focusable="true"
             android:padding="12dp"
             android:scaleType="centerInside"
@@ -94,7 +94,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Autorzy: Vladyslav Papanov, Paweł Bała"
+                android:text="Authors: Vladyslav Papanov, Paweł Bała"
                 android:textAlignment="center"
                 android:textColor="@color/primary_text"
                 android:textSize="16sp"
@@ -103,7 +103,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Aplikacja HistoryMap to interaktywna mapa historycznych wydarzeń, pozwalająca na eksplorację ważnych momentów w historii świata."
+                android:text="The HistoryMap app is an interactive map of historical events, allowing you to explore key moments in world history."
                 android:textAlignment="center"
                 android:textColor="@color/primary_text"
                 android:textSize="14sp"
@@ -114,7 +114,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Wykorzystane biblioteki:"
+                android:text="Used libraries:"
                 android:textStyle="bold"
                 android:textColor="@color/primary_text"
                 android:textSize="16sp"
@@ -123,7 +123,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="• OSMDroid - biblioteka mapowa\n• Glide - ładowanie obrazów\n• Gson - parsowanie JSON\n• Firebase - baza danych i autentykacja"
+                android:text="• OSMDroid - map library\n• Glide - image loading\n• Gson - JSON parsing\n• Firebase - database and authentication"
                 android:textColor="@color/primary_text"
                 android:textSize="14sp"
                 android:lineSpacingExtra="4dp"
@@ -132,7 +132,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Linki do bibliotek:"
+                android:text="Library links:"
                 android:textStyle="bold"
                 android:textColor="@color/primary_text"
                 android:textSize="16sp"
@@ -197,7 +197,7 @@
                 android:focusable="true"
                 android:minHeight="48dp"
                 android:paddingBottom="25dp"
-                android:text="Polityka prywatności"
+                android:text="Privacy policy"
                 android:textColor="@color/link"
                 android:textSize="14sp" />
 

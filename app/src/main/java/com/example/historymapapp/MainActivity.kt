@@ -406,7 +406,7 @@ class MainActivity : AppCompatActivity() {
 
         database.child("favorites").child(userId).child(event.title).setValue(favorite)
             .addOnSuccessListener {
-                Toast.makeText(this, "Dodano do ulubionych", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Błąd podczas dodawania", Toast.LENGTH_SHORT).show()
@@ -417,7 +417,7 @@ class MainActivity : AppCompatActivity() {
         val userId = auth.currentUser?.uid ?: return
         database.child("favorites").child(userId).child(eventTitle).removeValue()
             .addOnSuccessListener {
-                Toast.makeText(this, "Usunięto z ulubionych", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Removed from favorites", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Błąd podczas usuwania", Toast.LENGTH_SHORT).show()

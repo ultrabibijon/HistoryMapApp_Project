@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">HistoryMapApp</string>
-    <string name="settings">Ustawienia</string>
-    <string name="theme_settings">Motyw aplikacji</string>
-    <string name="theme_system">Systemowy</string>
-    <string name="theme_light">Jasny</string>
-    <string name="theme_dark">Ciemny</string>
-    <string name="back">Powrót</string>
-    <string name="expand_theme_options">Rozwiń opcje motywu</string>
-    <string name="theme_icon_description">Ikona motywu</string>
-    <string name="settings_list_description">Lista ustawień</string>
+    <string name="settings">Settings</string>
+    <string name="theme_settings">App theme</string>
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="back">Back</string>
+    <string name="expand_theme_options">Expand theme options</string>
+    <string name="theme_icon_description">Theme icon</string>
+    <string name="settings_list_description">Settings list</string>
 </resources>

@@ -22,7 +22,7 @@ class AboutActivity : AppCompatActivity() {
         try {
             val pInfo = packageManager.getPackageInfo(packageName, 0)
             val version = pInfo.versionName
-            findViewById<TextView>(R.id.app_version).text = "Wersja $version"
+            findViewById<TextView>(R.id.app_version).text = "Version $version"
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -30,76 +30,77 @@ class AboutActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.privacy_policy).setOnClickListener {
 
             val privacyText = """
-# Polityka Prywatności HistoryMap
+# HistoryMap Privacy Policy
 
-**Ostatnia aktualizacja: 07.05.2025**
+**Last updated: 2025-05-18**
 
-## 1. Informacje ogólne
+## 1. General Information
 
-Aplikacja HistoryMap ("My", "Nasza") szanuje Twoją prywatność. Niniejsza polityka wyjaśnia jakie dane zbieramy i jak je wykorzystujemy.
+The HistoryMap app ("We", "Our") respects your privacy. This policy explains what data we collect and how we use it.
 
-## 2. Gromadzone dane
+## 2. Collected Data
 
-### 2.1 Dane użytkownika
-- Podczas korzystania z aplikacji w trybie anonimowym zbieramy podstawowe informacje o urządzeniu (model, wersja systemu)
+### 2.1 User Data
+- When using the app anonymously, we collect basic device information (model, system version)
 
-### 2.2 Dane użytkowania
-- Lokalizacje wyświetlanych markerów
-- Wybrane filtry i preferencje
-- Czas spędzony w aplikacji
+### 2.2 Usage Data
+- Locations of displayed markers
+- Selected filters, preferences, and settings
+- Saved notes
+- Time spent in the app
 
-## 3. Jak wykorzystujemy dane
+## 3. How We Use the Data
 
-- Udoskonalanie działania aplikacji
-- Personalizacja wyświetlanych treści
-- Analiza popularności różnych wydarzeń historycznych
-- Bezpieczne przechowywanie Twoich ulubionych i historii przeglądania
+- Improving app functionality
+- Personalizing displayed content
+- Analyzing the popularity of historical events
+- Securely storing your favorites and browsing history
 
-## 4. Udostępnianie danych
+## 4. Data Sharing
 
-Nie sprzedajemy ani nie udostępniamy Twoich danych osobom trzecim, z wyjątkiem:
-- Dostawców usług (Firebase, Google Cloud) niezbędnych do działania aplikacji
-- Wymogów prawnych (na żądanie organów ścigania)
+We do not sell or share your data with third parties, except for:
+- Service providers (Firebase, Google Cloud) necessary for app functionality
+- Legal requirements (upon request by law enforcement)
 
-## 5. Bezpieczeństwo danych
+## 5. Data Security
 
-Stosujemy środki bezpieczeństwa:
-- Szyfrowanie transmisji (SSL)
-- Bezpieczne serwery Firebase
-- Ograniczony dostęp do danych
+We implement security measures:
+- Encrypted transmission (SSL)
+- Secure Firebase servers
+- Limited access to data
 
-## 6. Twoje prawa
+## 6. Your Rights
 
-Masz prawo do:
-- Dostępu do swoich danych
-- Sprostowania danych
-- Usunięcia konta i danych
-- Wniesienia sprzeciwu wobec przetwarzania
+You have the right to:
+- Access your data
+- Correct your data
+- Delete your account and data
+- Object to data processing
 
-## 7. Pliki cookies i śledzenie
+## 7. Cookies and Tracking
 
-Aplikacja używa:
-- Lokalnego przechowywania danych
-- Cookies Firebase do autentykacji
+The app uses:
+- Local data storage
+- Firebase cookies for authentication
 
-## 8. Zmiany w polityce
+## 8. Changes to the Policy
 
-Wszelkie zmiany będą publikowane w tej sekcji. Kontynuując korzystanie z aplikacji po zmianach, akceptujesz nową politykę.
+Any changes will be published in this section. By continuing to use the app after updates, you accept the new policy.
 
-## 9. Kontakt
+## 9. Contact
 
-W sprawach prywatności prosimy o kontakt:
+For privacy-related matters, please contact:
 - Email: vpapanov@st.swps.edu.pl
 
 ---
 
-**Dziękujemy za korzystanie z HistoryMap!**
+**Thank you for using HistoryMap!**
 """.trimIndent()
 
             AlertDialog.Builder(this)
-                .setTitle("Polityka Prywatności")
+                .setTitle("Privacy Policy")
                 .setMessage(privacyText)
-                .setPositiveButton("Rozumiem") { dialog, _ -> dialog.dismiss() }
+                .setPositiveButton("I understand") { dialog, _ -> dialog.dismiss() }
                 .create()
                 .apply {
                     setOnShowListener {
@@ -129,7 +130,7 @@ W sprawach prywatności prosimy o kontakt:
                 try {
                     startActivity(intent)
                 } catch (e: Exception) {
-                    Toast.makeText(this, "Nie można otworzyć linku", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Unable to open link", Toast.LENGTH_SHORT).show()
                 }
             }
         }

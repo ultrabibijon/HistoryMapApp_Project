@@ -38,7 +38,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="150dp"
         android:gravity="center"
-        android:text="Witaj w Mapie Historycznej – wyrusz w podróż przez czas"
+        android:text="Welcome to History Map – embark on a journey through time"
         android:textColor="@color/secondary_text"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -42,12 +42,12 @@ class NotesActivity : AppCompatActivity() {
             },
             onDeleteClick = { note ->
                 AlertDialog.Builder(this)
-                    .setTitle("Usuń notatkę")
-                    .setMessage("Czy na pewno chcesz usunąć tę notatkę?")
-                    .setPositiveButton("Tak") { _, _ ->
+                    .setTitle("Delete note")
+                    .setMessage("Are you sure you want to delete this note?")
+                    .setPositiveButton("Yes") { _, _ ->
                         deleteNote(note.id)
                     }
-                    .setNegativeButton("Anuluj", null)
+                    .setNegativeButton("Cancel", null)
                     .show()
             }
 
@@ -85,7 +85,7 @@ class NotesActivity : AppCompatActivity() {
             .reference.child("notes").child(userId).child(noteId)
             .removeValue()
             .addOnSuccessListener {
-                Toast.makeText(this, "Usunięto notatkę", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Błąd przy usuwaniu", Toast.LENGTH_SHORT).show()
